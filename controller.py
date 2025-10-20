@@ -2,11 +2,12 @@ import json
 
 import model
 import view
-from logger import log_decorator
+from logger import Observable, log_decorator
 
 
-class Controller:
+class Controller(Observable):
     def __init__(self, model: model.JsonConverter, view: view.View):
+        super().__init__()
         self.model = model
         self.view = view
         self.view.set_controller(self)

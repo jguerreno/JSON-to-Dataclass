@@ -1,3 +1,4 @@
+import logging
 import socket
 import threading
 
@@ -5,19 +6,30 @@ HOST = "localhost"
 PORT = 9999
 BUFSIZE = 1024
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("server.log", encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
+)
+
+logger = logging.getLogger(__name__)
+
 
 def handle_client_connection(conn: socket.socket, addr: tuple) -> None:
-    print(f"[SERVIDOR] Conectado por {addr}")
+    logger.info(f"[SERVIDOR] Conectado por {addr}")
     try:
         while True:
             data = conn.recv(BUFSIZE)
             if not data:
                 break
-            print(f"[LOG RECIBIDO] {data.decode('utf-8')}")
+            logger.info(f"[LOG RECIBIDO] {data.decode('utf-8')}")
     except ConnectionResetError:
-        print(f"[SERVIDOR] Conexión cerrada abruptamente por {addr}")
+        logger.warning(f"[SERVIDOR] Conexión cerrada abruptamente por {addr}")
     finally:
-        print(f"[SERVIDOR] Conexión con {addr} cerrada.")
+        logger.info(f"[SERVIDOR] Conexión con {addr} cerrada.")
         conn.close()
 
 
@@ -26,7 +38,7 @@ def start_server():
         s.bind((HOST, PORT))
         s.listen()
 
-        print(f"Escuchando en {HOST}:{PORT}...")
+        logger.info(f"Escuchando en {HOST}:{PORT}...")
         while True:
             conn, addr = s.accept()
             thread = threading.Thread(
