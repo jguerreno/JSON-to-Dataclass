@@ -2,10 +2,11 @@ import json
 import socket
 from datetime import datetime
 from functools import lru_cache
+from typing import Protocol
 
 
 def log_decorator(func):
-    logger: NetworkLogger = __get_logger()
+    logger: NetworkLogger = __get_network_logger()
 
     def wrapper(*args, **kwargs):
         logger.log(f"Ejecutando la función '{func.__name__}'")
@@ -21,6 +22,10 @@ def log_decorator(func):
             logger.log(f"ERROR: Unexpected error. {e}")
 
     return wrapper
+
+
+class Observer(Protocol):
+    def log(self, data: str): ...
 
 
 class NetworkLogger:
@@ -44,6 +49,22 @@ class NetworkLogger:
             print(f"[NETWORK LOG - ERROR]: Ocurrió un error al enviar el log: {e}")
 
 
+class ConsoleLogger:
+    def log(self, data: str):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[CONSOLE LOG - {timestamp}]: {data}")
+
+
+class FileLogger:
+    def __init__(self, filename="app_log.txt"):
+        self.filename = filename
+
+    def log(self, data: str):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(self.filename, "a") as f:
+            f.write(f"[{timestamp}]: {data}\n")
+
+
 @lru_cache
-def __get_logger() -> NetworkLogger:
+def __get_network_logger() -> NetworkLogger:
     return NetworkLogger()
