@@ -43,7 +43,7 @@ def handle_client_connection(conn: socket.socket, addr: tuple, logger: LogWriter
         conn.close()
 
 
-def start_server():
+def start_server(stop_event: threading.Event):
     logger = LogWriter(LOG_FILE)
     logger.write("[SERVIDOR] Iniciando servidor de logs...")
 
@@ -51,13 +51,18 @@ def start_server():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((HOST, PORT))
             s.listen()
+            s.settimeout(1.0)
 
             logger.write(f"[SERVIDOR] Escuchando en {HOST}:{PORT}...")
-            while True:
-                conn, addr = s.accept()
+            while not stop_event.is_set():
+                try:
+                    conn, addr = s.accept()
+                except socket.timeout:
+                    continue
                 thread = threading.Thread(
                     target=handle_client_connection, args=(conn, addr, logger)
                 )
+                thread.daemon = True
                 thread.start()
     finally:
         logger.write("[SERVIDOR] Apagando servidor de logs...")
@@ -65,4 +70,8 @@ def start_server():
 
 
 if __name__ == "__main__":
-    start_server()
+    stop_event = threading.Event()
+    try:
+        start_server(stop_event)
+    except KeyboardInterrupt:
+        stop_event.set()

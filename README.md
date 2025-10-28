@@ -67,6 +67,12 @@ python main.py
 
 Se abrirá la ventana de la aplicación.
 
+Tambien se puede hacer esto, para levantar la aplicacion y el servidor de log en un proceso aparte.
+
+```bash
+python main.py --with-server-log
+```
+
 
 ## Pipeline CI
 
