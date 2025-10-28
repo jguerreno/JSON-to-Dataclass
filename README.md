@@ -38,7 +38,8 @@ Esta implementación permite añadir nuevos sistemas de logging (ej. enviar a Sl
 ├── view.py             # Contiene la interfaz gráfica (Vista).
 ├── controller.py       # El intermediario entre el Modelo y la Vista (Controlador).
 ├── logger.py           # Decorador para logs.
-└── log_server.py       # Servidor independiente para recibir logs por la red.
+├── log_server.py       # Servidor independiente para recibir logs por la red.
+└── send_log.py         # Mini cli para enviar un mensaje al servidor de log
 ```
 
 ## Cómo Ejecutar el Proyecto
